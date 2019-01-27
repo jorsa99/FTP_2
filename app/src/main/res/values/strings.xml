@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">FTP</string>
+    <string name="msg_nologin">Ha habido un problema al iniciar sesión.</string>
+    <string name="msg_badconnection">Hubo un problema al intentar establecer conexión.</string>
+    <string name="msg_generic">Hubo un problema.</string>
 </resources>
