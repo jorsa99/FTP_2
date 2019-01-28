@@ -26,7 +26,7 @@ public class FtpThread extends Thread {
 
     private Context context;
 
-    private final String hostIp = "192.168.2.10";
+    private final String hostIp = "jorgesaez.atwebpages.com";
 
     private Mode mode;
     private FTPClient client;
@@ -90,7 +90,7 @@ public class FtpThread extends Thread {
         try {
             client.enterLocalPassiveMode();
             client.setFileType(FTP.BINARY_FILE_TYPE);
-            String data = "/Desktop"+ file ;
+            String data = context.getDataDir()+ file ;
 
             FileInputStream in = new FileInputStream(new File(data));
             boolean result = client.storeFile(path+"/"+file, in);
