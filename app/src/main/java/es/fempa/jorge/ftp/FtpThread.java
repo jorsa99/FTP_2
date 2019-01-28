@@ -1,5 +1,6 @@
 package es.fempa.jorge.ftp;
 
+import android.util.Log;
 import android.widget.EditText;
 
 import org.apache.commons.net.ftp.FTP;
@@ -10,6 +11,7 @@ import org.apache.commons.net.ftp.FTPReply;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -79,7 +81,26 @@ public class FtpThread extends Thread {
     }
 
     private void upload(){
+        try {
 
+            client.enterLocalPassiveMode();
+            client.setFileType(FTP.BINARY_FILE_TYPE);
+            String data = "/Desktop"+ file ;
+
+            FileInputStream in = new FileInputStream(new File(data));
+            boolean result = client.storeFile(path+"/"+file, in);
+            in.close();
+            if (result){
+                Log.e("1", "FUUUUUUUUUUUUUUUUUUUUUUNCIONA");
+            } else {
+                Log.e("2", "NO VAAAAAAAAAAAAAAAAAAAAAAAAAA");
+            }
+            client.logout();
+            client.disconnect();
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private void download() {
