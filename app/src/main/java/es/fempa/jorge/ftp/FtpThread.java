@@ -1,5 +1,6 @@
 package es.fempa.jorge.ftp;
 
+import android.content.Context;
 import android.util.Log;
 import android.widget.EditText;
 
@@ -23,6 +24,8 @@ public class FtpThread extends Thread {
 
     public enum Mode {Upload, Download}
 
+    private Context context;
+
     private final String hostIp = "192.168.2.10";
 
     private Mode mode;
@@ -38,7 +41,8 @@ public class FtpThread extends Thread {
             file,
             content;
 
-    public FtpThread(Mode mode, EditText etPath, EditText etFile, EditText etContent){
+    public FtpThread(Context context, Mode mode, EditText etPath, EditText etFile, EditText etContent){
+        this.context = context;
         this.mode = mode;
         this.etPath = etPath;
         this.etFile = etFile;
@@ -82,7 +86,6 @@ public class FtpThread extends Thread {
 
     private void upload(){
         try {
-
             client.enterLocalPassiveMode();
             client.setFileType(FTP.BINARY_FILE_TYPE);
             String data = "/Desktop"+ file ;
@@ -122,7 +125,7 @@ public class FtpThread extends Thread {
                     //File name entered: read file content.
                     else {
                         boolean fileExists = false;
-                        File temp = new File("myfile.txt");
+                        File temp = new File(context.getDataDir()+"myfile.txt");
                         InputStream in;
                         OutputStream os;
                         for(FTPFile currentFile : client.listFiles()){
