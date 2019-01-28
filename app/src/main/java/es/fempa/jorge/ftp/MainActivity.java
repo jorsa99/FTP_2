@@ -25,7 +25,6 @@ public class MainActivity extends AppCompatActivity {
             etFile,
             etText;
 
-    private String ruta, texto, fichero;
 
     //MAIN ACTIVITY METHODS
 
@@ -40,11 +39,7 @@ public class MainActivity extends AppCompatActivity {
         btnUpload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ruta = etPath.getText().toString();
-                fichero = etFile.getText().toString();
-                texto = etText.getText().toString();
-
-                thread = new FtpThread(Mode.Upload, ruta, fichero, texto);
+                thread = new FtpThread(Mode.Upload, etPath, etFile, etText);
                 thread.start();
             }
         });
@@ -53,11 +48,7 @@ public class MainActivity extends AppCompatActivity {
         btnDownload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ruta = etPath.getText().toString();
-                fichero = etFile.getText().toString();
-                texto = etText.getText().toString();
-
-                thread = new FtpThread(Mode.Download, ruta, fichero, texto);
+                thread = new FtpThread(Mode.Download, etPath, etFile, etText);
                 thread.start();
             }
         });

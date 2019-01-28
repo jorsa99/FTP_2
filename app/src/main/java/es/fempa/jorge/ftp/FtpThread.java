@@ -1,99 +1,124 @@
 package es.fempa.jorge.ftp;
 
-import android.util.Log;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
+import org.apache.commons.net.ftp.FTPReply;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.SocketException;
 
 public class FtpThread extends Thread {
 
-
     public enum Mode {Upload, Download}
 
     private final String hostIp = "192.168.2.10";
-    private final int hostPort = 21;
-
-    private String ruta, fichero, texto;
 
     private Mode mode;
     private FTPClient client;
 
-    public FtpThread(Mode mode, String _ruta, String _fichero, String _texto){
-        this.ruta = _ruta;
-        this.fichero = _fichero;
-        this.texto = _texto;
-        client = new FTPClient();
+    private EditText
+            etPath,
+            etFile,
+            etContent;
+
+    private String
+            path,
+            file,
+            content;
+
+    public FtpThread(Mode mode, EditText etPath, EditText etFile, EditText etContent){
         this.mode = mode;
+        this.etPath = etPath;
+        this.etFile = etFile;
+        this.etContent = etContent;
     }
 
     //THREAD METHODS
 
     @Override
     public void run() {
-        connect();
-        switch (mode){
-            case Upload:
-                upload();
-                break;
-
-            case Download:
-
-                break;
-
-            default:
-
-                break;
-        }
+        path = etPath.getText().toString();
+        file = etFile.getText().toString();
+        content = etContent.getText().toString();
+        connect(mode);
     }
 
     //CLASS METHODS
 
-    private void connect(){
+    //Connection methods
+
+    private void connect(Mode mode){
+        client = new FTPClient();
         try{
-            client.connect(hostIp, hostPort);
-            client.enterLocalPassiveMode();
+            client.setConnectTimeout(10000);
+            client.connect(InetAddress.getByName(hostIp));
             client.login("2599130_jorge", "habbojorge1");
+            client.enterLocalPassiveMode();
+            client.setFileType(FTP.ASCII_FILE_TYPE);
+            if(!FTPReply.isPositiveCompletion(client.getReply()))
+                disconnect();
+            else{
+
+            }
         } catch (SocketException e){
-
+            //TODO: Handle exception.
         } catch (IOException e){
-
+            //TODO: Handle exception.
         }
 
     }
 
     private void upload(){
-        connect();
 
-        try {
+    }
 
-            client.enterLocalPassiveMode();
-            client.setFileType(FTP.BINARY_FILE_TYPE);
-            String data = "/Desktop"+ fichero ;
+    private void download() {
+        //Path is entered.
+        if(path.length()>0){
+            try {
+                if(client.changeWorkingDirectory(path)){
+                    for (FTPFile currentFile : client.listFiles()){
+                        //File name entered: listing file names.
+                        if(file.length()==0)
+                            etContent.append(currentFile.getName()+"\n");
+                        //File name not entered:
+                        else{
+                            if (currentFile.getName().equals(file)){
 
-            FileInputStream in = new FileInputStream(new File(data));
-            boolean result = client.storeFile(ruta+"/"+fichero, in);
-            in.close();
-            if (result){
-                Log.e("1", "FUUUUUUUUUUUUUUUUUUUUUUNCIONA");
-            } else {
-                Log.e("2", "NO VAAAAAAAAAAAAAAAAAAAAAAAAAA");
+                                etContent.append("");
+                            }
+                        }
+                    }
+                }
+                else{
+                    //TODO: Path doesn't exist ERROR.
+                }
+            } catch (IOException e) {
+                //TODO: Handle exception. Change directory failure.
             }
-            client.logout();
-            client.disconnect();
-
-        }catch (Exception e){
-            e.printStackTrace();
+        }
+        else{
+            //TODO: Path not entered ERROR.
         }
     }
 
-    private void download(){
+    private void disconnect() {
+        if(client.isConnected()){
+            try {
+                client.logout();
+                client.disconnect();
+            } catch (IOException e){
+                //TODO: Handle exception. Disconnection failure.
+            }
+
+        }
+    }
+
+    private void errorSender(){
 
     }
 
