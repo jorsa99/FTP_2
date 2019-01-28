@@ -7,7 +7,13 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.SocketException;
 
@@ -82,14 +88,22 @@ public class FtpThread extends Thread {
             try {
                 if(client.changeWorkingDirectory(path)){
                     for (FTPFile currentFile : client.listFiles()){
-                        //File name entered: listing file names.
+                        //File name not entered: listing file names.
                         if(file.length()==0)
                             etContent.append(currentFile.getName()+"\n");
-                        //File name not entered:
+                        //File name entered: display file content.
                         else{
                             if (currentFile.getName().equals(file)){
-
-                                etContent.append("");
+                                File downloadedFile = new File("download.txt");
+                                OutputStream os = new BufferedOutputStream(new FileOutputStream(downloadedFile));
+                                InputStream is = client.retrieveFileStream(file);
+                                byte[] byteArray = new byte[4096];
+                                int bytesRead;
+                                while((bytesRead = is.read(byteArray)) != -1)
+                                    os.write(byteArray, 0, bytesRead);
+                                os.close();
+                                is.close();
+                                break;
                             }
                         }
                     }
