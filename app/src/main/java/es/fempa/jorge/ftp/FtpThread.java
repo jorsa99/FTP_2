@@ -87,26 +87,40 @@ public class FtpThread extends Thread {
         if(path.length()>0){
             try {
                 if(client.changeWorkingDirectory(path)){
-                    for (FTPFile currentFile : client.listFiles()){
-                        //File name not entered: listing file names.
-                        if(file.length()==0)
-                            etContent.append(currentFile.getName()+"\n");
-                        //File name entered: display file content.
+                    //File name not entered: list file names.
+                    if(file.length()==0) {
+                        String[] nameArray = client.listNames();
+                        if(nameArray.length != 0) {
+                            for(String name : nameArray)
+                                etContent.append(name+"\n");
+                        }
                         else{
-                            if (currentFile.getName().equals(file)){
-                                File downloadedFile = new File("download.txt");
-                                OutputStream os = new BufferedOutputStream(new FileOutputStream(downloadedFile));
-                                InputStream is = client.retrieveFileStream(file);
-                                byte[] byteArray = new byte[4096];
-                                int bytesRead;
-                                while((bytesRead = is.read(byteArray)) != -1)
-                                    os.write(byteArray, 0, bytesRead);
-                                os.close();
-                                is.close();
-                                break;
-                            }
+                            //TODO: path is empty ERROR.
                         }
                     }
+                    //File name entered: read file content.
+                    else {
+                        boolean fileExists = false;
+                        File temp = new File("myfile.txt");
+                        InputStream in;
+                        OutputStream os;
+                        for(FTPFile currentFile : client.listFiles()){
+                            if(currentFile.getName().equals(file)){
+                                fileExists = true;
+                                in = client.retrieveFileStream(currentFile.getName());
+                                os = new BufferedOutputStream(new FileOutputStream(temp));
+                                byte[] bytes = new byte[4096];
+                                int readBytes;
+                                while((readBytes = in.read(bytes)) != -1)
+                                    os.write(bytes, 0, readBytes);
+                                //TODO: falta escritura en fichero local
+                            }
+                        }
+                        if(!fileExists){
+                            //TODO: file not found ERROR.
+                        }
+                    }
+
                 }
                 else{
                     //TODO: Path doesn't exist ERROR.
