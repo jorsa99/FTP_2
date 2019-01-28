@@ -7,7 +7,13 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.SocketException;
 
@@ -81,18 +87,40 @@ public class FtpThread extends Thread {
         if(path.length()>0){
             try {
                 if(client.changeWorkingDirectory(path)){
-                    for (FTPFile currentFile : client.listFiles()){
-                        //File name entered: listing file names.
-                        if(file.length()==0)
-                            etContent.append(currentFile.getName()+"\n");
-                        //File name not entered:
+                    //File name not entered: list file names.
+                    if(file.length()==0) {
+                        String[] nameArray = client.listNames();
+                        if(nameArray.length != 0) {
+                            for(String name : nameArray)
+                                etContent.append(name+"\n");
+                        }
                         else{
-                            if (currentFile.getName().equals(file)){
-
-                                etContent.append("");
-                            }
+                            //TODO: path is empty ERROR.
                         }
                     }
+                    //File name entered: read file content.
+                    else {
+                        boolean fileExists = false;
+                        File temp = new File("myfile.txt");
+                        InputStream in;
+                        OutputStream os;
+                        for(FTPFile currentFile : client.listFiles()){
+                            if(currentFile.getName().equals(file)){
+                                fileExists = true;
+                                in = client.retrieveFileStream(currentFile.getName());
+                                os = new BufferedOutputStream(new FileOutputStream(temp));
+                                byte[] bytes = new byte[4096];
+                                int readBytes;
+                                while((readBytes = in.read(bytes)) != -1)
+                                    os.write(bytes, 0, readBytes);
+                                //TODO: falta escritura en fichero local
+                            }
+                        }
+                        if(!fileExists){
+                            //TODO: file not found ERROR.
+                        }
+                    }
+
                 }
                 else{
                     //TODO: Path doesn't exist ERROR.
