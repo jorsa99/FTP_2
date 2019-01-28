@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         btnUpload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                thread = new FtpThread(Mode.Upload);
+                thread = new FtpThread(Mode.Upload, etPath, etFile, etText);
                 thread.start();
             }
         });
@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         btnDownload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                thread = new FtpThread(Mode.Download);
+                thread = new FtpThread(Mode.Download, etPath, etFile, etText);
                 thread.start();
             }
         });
