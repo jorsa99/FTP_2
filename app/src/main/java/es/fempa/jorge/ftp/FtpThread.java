@@ -66,11 +66,13 @@ public class FtpThread extends Thread {
             client.connect(InetAddress.getByName(hostIp));
             client.login("2599130_jorge", "habbojorge1");
             client.enterLocalPassiveMode();
-            client.setFileType(FTP.ASCII_FILE_TYPE);
+            client.setFileType(FTP.BINARY_FILE_TYPE);
             if(!FTPReply.isPositiveCompletion(client.getReply()))
                 disconnect();
-            else{
-
+            else if (mode.equals(Mode.Upload)){
+                upload();
+            } else if(mode.equals(Mode.Download)){
+                download();
             }
         } catch (SocketException e){
             //TODO: Handle exception.
