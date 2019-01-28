@@ -89,7 +89,7 @@ public class FtpThread extends Thread {
                         else{
                             if (currentFile.getName().equals(file)){
 
-                                etContent.append();
+                                etContent.append("");
                             }
                         }
                     }
